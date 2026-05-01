@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marvel Champions Tracker</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.3.1?dev",
+          "react-dom": "https://esm.sh/react-dom@18.3.1?dev",
+          "react-dom/client": "https://esm.sh/react-dom@18.3.1/client?dev",
+          "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime?dev",
+          "lucide-react": "https://esm.sh/lucide-react@4.0.0?dev"
+        }
+      }
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #000;
+        color: #fff;
+      }
+      body {
+        font-family: Inter, system-ui, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      window.storage = {
+        get: async (key) => {
+          const value = localStorage.getItem(key);
+          return { value };
+        },
+        set: async (key, value) => {
+          localStorage.setItem(key, value);
+          return { success: true };
+        },
+      };
+    </script>
+
+    <script src="https://esm.sh/@babel/standalone@7.25.0/babel.min.js"></script>
+    <script type="module">
+      import React from 'react';
+      import { createRoot } from 'react-dom/client';
+
+      async function loadApp() {
+        const response = await fetch('./marvel-champions-tracker.jsx');
+        const source = await response.text();
+        const result = Babel.transform(source, {
+          presets: [['react', { runtime: 'automatic' }]],
+          sourceType: 'module',
+        });
+
+        const blob = new Blob([result.code], { type: 'application/javascript' });
+        const module = await import(URL.createObjectURL(blob));
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(React.createElement(module.default));
+      }
+
+      loadApp().catch((error) => {
+        console.error(error);
+        document.getElementById('root').textContent = 'Error al cargar la aplicación. Revisa la consola.';
+      });
+    </script>
+  </body>
+</html>
